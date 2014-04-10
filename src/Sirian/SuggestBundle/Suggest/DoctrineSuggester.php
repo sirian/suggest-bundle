@@ -31,11 +31,13 @@ abstract class DoctrineSuggester implements SuggesterInterface
         return $this->getLoader()->getEntitiesByIds($this->options['id_property'], $ids);
     }
 
-    public function transform(array $items)
+    public function transform($objects)
     {
-        return array_map(function ($item) {
-            return $this->transformItem($item);
-        }, $items);
+        $result = [];
+        foreach ($objects as $object) {
+            $result[] = $this->transformItem($object);
+        }
+        return $result;
     }
 
     protected function transformItem($item)

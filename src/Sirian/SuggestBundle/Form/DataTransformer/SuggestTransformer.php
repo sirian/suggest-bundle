@@ -23,7 +23,7 @@ class SuggestTransformer implements DataTransformerInterface
             return $this->multiple ? [] : null;
         }
 
-        if ($this->multiple !== is_array($value)) {
+        if ($this->multiple && !(is_array($value) || $value instanceof \Traversable)) {
             throw new TransformationFailedException();
         }
 

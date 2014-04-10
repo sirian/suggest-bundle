@@ -11,10 +11,10 @@ interface SuggesterInterface
     public function suggest(SuggestQuery $query);
 
     /**
-     * @param array $items
+     * @param array|\Traversable $objects
      * @return Item[]
      */
-    public function transform(array $items);
+    public function transform($objects);
 
     /**
      * @param array $ids
