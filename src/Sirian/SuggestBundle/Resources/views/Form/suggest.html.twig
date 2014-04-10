@@ -46,7 +46,7 @@
                 },
                 dataType: 'json',
                 success: function (data) {
-                    callback(data)
+                    callback({% if multiple %}data{% else %}data[0]{% endif %})
                 }
             });
         }
