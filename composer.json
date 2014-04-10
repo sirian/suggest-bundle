@@ -1,0 +1,13 @@
+{
+    "name": "sirian/suggest-bundle",
+    "type": "library",
+    "description": "symfony2 suggest (autocomplete) bundle",
+    "keywords": [],
+    "autoload": {
+        "psr-0": { "Sirian\\SuggestBundle\\": "src/" }
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "symfony/symfony": ">=2.3.0"
+    }
+}

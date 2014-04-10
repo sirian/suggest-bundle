@@ -1,0 +1,16 @@
+parameters:
+
+
+services:
+    sirian_suggest.registry:
+        class: Sirian\SuggestBundle\Suggest\SuggesterRegistry
+        arguments: [@service_container]
+
+    sirian_suggest.form.extension:
+        class: Sirian\SuggestBundle\DependencyInjection\SirianSuggestExtension
+        arguments: [@sirian_suggest.registry]
+
+    sirian_suggest.suggest_form_type:
+        class: Sirian\SuggestBundle\Form\Type\SuggestType
+        arguments: [~, ~, ~]
+        abstract: true

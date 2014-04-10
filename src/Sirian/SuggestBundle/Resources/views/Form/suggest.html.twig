@@ -1,0 +1,54 @@
+{% block suggest_widget %}
+    <input type="text" {{ block('widget_attributes') }} value="{{ ids|join(', ') }}">
+
+    <script type="text/javascript">
+        (function ($) {
+            var $input = $('#{{ id }}');
+
+            $input.select2({{ block('suggest_options') }});
+        }(jQuery));
+    </script>
+{% endblock %}
+
+{% block suggest_options %}
+    {
+        allowClear: !$input.prop('required'),
+        placeholder: '{{ attr.placeholder|default('Search') }}',
+        multiple: {{ multiple ? 1 : 0 }},
+        ajax: {
+            url: '{{ path('sirian_suggest', {name: suggester_name}) }}',
+                    dataType: 'json',
+                    data: function (term, page) {
+                return {
+                    q: term,
+                    page: page,
+                    extra: {}
+                }
+            },
+            results: function (data, page) {
+                return {
+                    results: data.items,
+                    more: data.hasMore
+                }
+            }
+        },
+        initSelection: function (element, callback) {
+            if (!$input.data('suggest_initialized')) {
+                callback({{ value|json_encode|raw }});
+                $input.data('suggest_initialized', 1);
+                return;
+            }
+
+            $.ajax({
+                url: '{{ path('sirian_suggest_init', {name: suggester_name}) }}',
+                data: {
+                    ids: element.val()
+                },
+                dataType: 'json',
+                success: function (data) {
+                    callback(data)
+                }
+            });
+        }
+    }
+{% endblock %}

@@ -1,0 +1,7 @@
+sirian_suggest:
+    pattern:  /{name}/suggest
+    defaults: { _controller: SirianSuggestBundle:Suggest:suggest }
+
+sirian_suggest_init:
+    pattern:  /{name}/init
+    defaults: { _controller: SirianSuggestBundle:Suggest:init }
