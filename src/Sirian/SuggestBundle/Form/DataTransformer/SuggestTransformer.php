@@ -31,7 +31,16 @@ class SuggestTransformer implements DataTransformerInterface
             $value = [$value];
         }
 
-        $result = $this->suggester->transform($value);
+        $items = $this->suggester->transform($value);
+
+        $result = [];
+        foreach ($items as $item) {
+            $result[] = [
+                'id' => $item->id,
+                'text' => $item->text,
+                'extra' => $item->extra
+            ];
+        }
 
         return $this->multiple ? $result : ($result ? $result[0] : null);
     }

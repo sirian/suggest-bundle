@@ -38,14 +38,17 @@ class SirianSuggestExtension extends Extension
 
     protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService)
     {
+        $registry = $container->getDefinition('sirian_suggest.registry');
+
         foreach ($suggesterConfigs as $id => $config) {
             $definition = new DefinitionDecorator($parentService);
             $definition
                 ->replaceArgument(1, $config)
-                ->addTag('sirian_suggester', ['alias' => $id])
             ;
 
             $suggesterId = 'sirian_suggest.odm.' . $id;
+
+            $registry->addMethodCall('addService', [$id, $suggesterId]);
 
             $container->setDefinition($suggesterId, $definition);
 
@@ -70,7 +73,9 @@ class SirianSuggestExtension extends Extension
 
     private function registerCustomSuggesters(ContainerBuilder $container, $config)
     {
+        $registry = $container->getDefinition('sirian_suggest.registry');
         foreach ($config as $id => $serviceId) {
+            $registry->addMethodCall('addService', [$id, $serviceId]);
             $this->registerFormType($container, $serviceId, $id);
         }
     }
