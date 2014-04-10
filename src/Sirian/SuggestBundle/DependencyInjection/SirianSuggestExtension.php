@@ -27,6 +27,13 @@ class SirianSuggestExtension extends Extension
             $loader->load('odm.yml');
             $this->registerDoctrineSuggesters($container, $config['odm'], 'sirian_suggest.document_suggester');
         }
+
+        if ($config['orm']) {
+            $loader->load('orm.yml');
+            $this->registerDoctrineSuggesters($container, $config['orm'], 'sirian_suggest.entity_suggester');
+        }
+
+        $this->registerCustomSuggesters($container, $config['custom']);
     }
 
     protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService)
@@ -59,5 +66,12 @@ class SirianSuggestExtension extends Extension
         ;
 
         $container->setDefinition('form.type.' . $name, $formType);
+    }
+
+    private function registerCustomSuggesters(ContainerBuilder $container, $config)
+    {
+        foreach ($config as $id => $serviceId) {
+            $this->registerFormType($container, $serviceId, $id);
+        }
     }
 }

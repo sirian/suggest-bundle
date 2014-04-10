@@ -17,6 +17,12 @@ class Configuration implements ConfigurationInterface
         $this->addConfiguration($rootNode, 'odm');
         $this->addConfiguration($rootNode, 'orm');
 
+        $rootNode
+            ->children()
+                ->arrayNode('custom')
+                    ->prototype('scalar')
+        ;
+
         return $treeBuilder;
     }
 
