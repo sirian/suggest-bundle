@@ -43,7 +43,12 @@ class SirianSuggestExtension extends Extension
         foreach ($suggesterConfigs as $id => $config) {
             $definition = new DefinitionDecorator($parentService);
             $definition
-                ->replaceArgument(1, $config)
+                ->replaceArgument(1, [
+                    'class' => $config['class'],
+                    'id_property' => $config['id_property'],
+                    'property' => $config['property'],
+                    'search' => $config['search'],
+                ])
             ;
 
             $suggesterId = 'sirian_suggest.odm.' . $id;
