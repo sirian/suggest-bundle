@@ -35,18 +35,18 @@ abstract class DoctrineSuggester implements SuggesterInterface
     {
         $result = [];
         foreach ($objects as $object) {
-            $result[] = $this->transformItem($object);
+            $result[] = $this->transformObject($object);
         }
         return $result;
     }
 
-    protected function transformItem($item)
+    protected function transformObject($object)
     {
-        $resultItem = new Item();
-        $resultItem->id = $this->propertyAccessor->getValue($item, $this->options['id_property']);
-        $resultItem->text = $this->propertyAccessor->getValue($item, $this->options['property']);
+        $item = new Item();
+        $item->id = $this->propertyAccessor->getValue($object, $this->options['id_property']);
+        $item->text = $this->propertyAccessor->getValue($object, $this->options['property']);
 
-        return $resultItem;
+        return $item;
     }
 
     public function suggest(SuggestQuery $query)
