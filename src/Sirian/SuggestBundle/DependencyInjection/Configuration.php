@@ -20,7 +20,19 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode('custom')
-                    ->prototype('scalar')
+                ->useAttributeAsKey('id')
+                ->prototype('array')
+                    ->beforeNormalization()->ifString()->then(function ($value) {
+                        return [
+                            'suggester' => $value
+                        ];
+                    })->end()
+                    ->children()
+                        ->scalarNode('suggester')->end()
+                        ->arrayNode('form_options')
+                            ->prototype('variable')
+                        ->end()
+
         ;
 
         return $treeBuilder;
@@ -40,10 +52,14 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('search')
                             ->prototype('scalar')
                             ->treatNullLike('middle')
-                            ->validate()
-                            ->ifNotInArray(['prefix', 'suffix', 'middle'])
-                            ->thenInvalid('Available search types: "prefix", "suffix", "middle"')
+                                ->validate()
+                                    ->ifNotInArray(['prefix', 'suffix', 'middle'])
+                                    ->thenInvalid('Available search types: "prefix", "suffix", "middle"')
+                                ->end()
                             ->end()
+                        ->end()
+                        ->arrayNode('form_options')
+                            ->prototype('variable')
                         ->end()
                     ->end()
                 ->end()

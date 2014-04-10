@@ -16,12 +16,14 @@ class SuggestType extends AbstractType
     private $suggester;
     private $suggesterName;
     private $name;
+    private $defaultOptions;
 
-    public function __construct(SuggesterInterface $suggester, $suggesterName, $name)
+    public function __construct(SuggesterInterface $suggester, $suggesterName, $name, array $defaultOptions)
     {
         $this->suggester = $suggester;
         $this->name = $name;
         $this->suggesterName = $suggesterName;
+        $this->defaultOptions = $defaultOptions;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -54,10 +56,10 @@ class SuggestType extends AbstractType
 
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(array_merge([
             'compound' => false,
             'multiple' => false
-        ]);
+        ], $this->defaultOptions));
     }
 
     public function getName()

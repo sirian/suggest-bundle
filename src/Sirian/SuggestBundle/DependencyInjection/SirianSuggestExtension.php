@@ -52,11 +52,11 @@ class SirianSuggestExtension extends Extension
 
             $container->setDefinition($suggesterId, $definition);
 
-            $this->registerFormType($container, $suggesterId, $id);
+            $this->registerFormType($container, $suggesterId, $id, $config['form_options']);
         }
     }
 
-    protected function registerFormType(ContainerBuilder $container, $suggesterId, $suggesterName)
+    protected function registerFormType(ContainerBuilder $container, $suggesterId, $suggesterName, $defaultOptions)
     {
         $name = 'suggest_' . $suggesterName;
 
@@ -65,6 +65,7 @@ class SirianSuggestExtension extends Extension
             ->replaceArgument(0, new Reference($suggesterId))
             ->replaceArgument(1, $suggesterName)
             ->replaceArgument(2, $name)
+            ->replaceArgument(3, $defaultOptions)
             ->addTag('form.type', ['alias' => $name])
         ;
 
@@ -74,9 +75,9 @@ class SirianSuggestExtension extends Extension
     private function registerCustomSuggesters(ContainerBuilder $container, $config)
     {
         $registry = $container->getDefinition('sirian_suggest.registry');
-        foreach ($config as $id => $serviceId) {
-            $registry->addMethodCall('addService', [$id, $serviceId]);
-            $this->registerFormType($container, $serviceId, $id);
+        foreach ($config as $id => $params) {
+            $registry->addMethodCall('addService', [$id, $params['suggester']]);
+            $this->registerFormType($container, $params['suggester'], $id, $params['form_options']);
         }
     }
 }
