@@ -39,7 +39,7 @@ class SuggestType extends AbstractType
         $ids = [];
 
         if ($options['multiple']) {
-            $ids = array_map(function (Item $item) {
+            $ids = array_map(function ($item) {
                 return $item['id'];
             }, $view->vars['value']);
         } elseif ($view->vars['value']) {
