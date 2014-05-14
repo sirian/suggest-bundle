@@ -25,18 +25,18 @@ class SirianSuggestExtension extends Extension
 
         if ($config['odm']) {
             $loader->load('odm.yml');
-            $this->registerDoctrineSuggesters($container, $config['odm'], 'sirian_suggest.document_suggester');
+            $this->registerDoctrineSuggesters($container, $config['odm'], 'sirian_suggest.document_suggester', $config['form_options']);
         }
 
         if ($config['orm']) {
             $loader->load('orm.yml');
-            $this->registerDoctrineSuggesters($container, $config['orm'], 'sirian_suggest.entity_suggester');
+            $this->registerDoctrineSuggesters($container, $config['orm'], 'sirian_suggest.entity_suggester', $config['form_options']);
         }
 
-        $this->registerCustomSuggesters($container, $config['custom']);
+        $this->registerCustomSuggesters($container, $config['custom'], $config['form_options']);
     }
 
-    protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService)
+    protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService, $formOptions)
     {
         $registry = $container->getDefinition('sirian_suggest.registry');
 
@@ -57,7 +57,7 @@ class SirianSuggestExtension extends Extension
 
             $container->setDefinition($suggesterId, $definition);
 
-            $this->registerFormType($container, $suggesterId, $id, $config['form_options']);
+            $this->registerFormType($container, $suggesterId, $id, array_merge($formOptions, $config['form_options']));
         }
     }
 
@@ -77,12 +77,12 @@ class SirianSuggestExtension extends Extension
         $container->setDefinition('form.type.' . $name, $formType);
     }
 
-    private function registerCustomSuggesters(ContainerBuilder $container, $config)
+    private function registerCustomSuggesters(ContainerBuilder $container, $config, $formOptions)
     {
         $registry = $container->getDefinition('sirian_suggest.registry');
         foreach ($config as $id => $params) {
             $registry->addMethodCall('addService', [$id, $params['suggester']]);
-            $this->registerFormType($container, $params['suggester'], $id, $params['form_options']);
+            $this->registerFormType($container, $params['suggester'], $id, array_merge($formOptions, $params['form_options']));
         }
     }
 }

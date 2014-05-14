@@ -19,6 +19,11 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->arrayNode('form_options')
+                    ->prototype('variable')
+                    ->end()
+                ->end()
+
                 ->arrayNode('custom')
                 ->useAttributeAsKey('id')
                 ->prototype('array')
@@ -31,7 +36,9 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('suggester')->end()
                         ->arrayNode('form_options')
                             ->prototype('variable')
+                            ->end()
                         ->end()
+
 
         ;
 
