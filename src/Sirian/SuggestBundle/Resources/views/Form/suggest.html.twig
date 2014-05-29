@@ -22,7 +22,7 @@
                 return {
                     q: term,
                     page: page,
-                    extra: {{ extra|defaul({})|json_encode|raw }}
+                    extra: {{ extra|default({})|json_encode|raw }}
                 }
             },
             results: function (data, page) {
