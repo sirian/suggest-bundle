@@ -49,7 +49,8 @@ class SuggestType extends AbstractType
         $view->vars = array_merge([
             'ids' => $ids,
             'multiple' => $options['multiple'],
-            'suggester_name' => $this->suggesterName
+            'suggester_name' => $this->suggesterName,
+            'extra' => $options['extra']
         ], $view->vars);
     }
 
@@ -58,7 +59,8 @@ class SuggestType extends AbstractType
     {
         $resolver->setDefaults(array_merge([
             'compound' => false,
-            'multiple' => false
+            'multiple' => false,
+            'extra' => [] 
         ], $this->defaultOptions));
     }
 
