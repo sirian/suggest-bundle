@@ -47,6 +47,7 @@ class DocumentSuggester extends DoctrineSuggester
             ->addAnd($or)
             ->skip($offset)
             ->limit($this->options['limit'] + 1)
+            ->sort($this->options['property'], 1)
         ;
 
         return $qb;
