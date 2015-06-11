@@ -58,7 +58,7 @@ abstract class DoctrineSuggester implements SuggesterInterface
         return new Result($this->transform($entities), $hasMore);
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setDefaults([
@@ -69,27 +69,38 @@ abstract class DoctrineSuggester implements SuggesterInterface
 
         $resolver->setRequired(['id_property', 'property', 'class', 'search']);
 
-        $registry = $this->registry;
-        $resolver->setNormalizers([
-            'manager' => function (Options $options, $manager) use ($registry) {
-                /* @var ManagerRegistry $registry */
-                if (null !== $manager) {
-                    return $registry->getManager($manager);
+
+        if (method_exists($resolver, 'setNormalizer')) {
+            $resolver->setNormalizer('manager', function (Options $options, $manager) {
+                return $this->normalize($options, $manager);
+            });
+        } else {
+            // BC
+            $resolver->setNormalizers([
+                'manager' => function (Options $options, $manager) {
+                    return $this->normalize($options, $manager);
                 }
+            ]);
+        }
+    }
 
-                $manager = $registry->getManagerForClass($options['class']);
+    protected function normalize(Options $options, $manager)
+    {
+        if (null !== $manager) {
+            return $this->registry->getManager($manager);
+        }
 
-                if (null === $manager) {
-                    throw new \RuntimeException(sprintf(
-                        'Class "%s" seems not to be a managed Doctrine entity.' .
-                        'Did you forget to map it?',
-                        $options['class']
-                    ));
-                }
+        $manager = $this->registry->getManagerForClass($options['class']);
 
-                return $manager;
-            }
-        ]);
+        if (null === $manager) {
+            throw new \RuntimeException(sprintf(
+                'Class "%s" seems not to be a managed Doctrine entity.' .
+                'Did you forget to map it?',
+                $options['class']
+            ));
+        }
+
+        return $manager;
     }
 
     protected function prepareOptions($options)
@@ -100,7 +111,7 @@ abstract class DoctrineSuggester implements SuggesterInterface
             ];
         }
         $resolver = new OptionsResolver();
-        $this->setDefaultOptions($resolver);
+        $this->configureOptions($resolver);
         return $resolver->resolve($options);
     }
 
