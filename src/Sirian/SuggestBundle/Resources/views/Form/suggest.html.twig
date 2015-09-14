@@ -1,5 +1,11 @@
 {% block suggest_widget %}
-    <select {{ block('widget_attributes') }}>
+    {% if multiple %}
+        {% set full_name = full_name ~ '[]' %}
+    {% endif %}
+    <select{% if multiple %} multiple{% endif %} {{ block('widget_attributes') }}>
+        {% for item in value %}
+            <option selected="selected" value="{{ item.id }}">{{ item.text }}</option>
+        {% endfor %}
     </select>
     <script type="text/javascript">
         (function ($) {
