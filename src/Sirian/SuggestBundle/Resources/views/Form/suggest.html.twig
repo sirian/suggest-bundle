@@ -1,10 +1,9 @@
 {% block suggest_widget %}
-    <input type="text" {{ block('widget_attributes') }} value="{{ ids|join(', ') }}">
-
+    <select {{ block('widget_attributes') }}>
+    </select>
     <script type="text/javascript">
         (function ($) {
             var $input = $('#{{ id }}');
-
             $input.select2({{ block('suggest_options') }});
         }(jQuery));
     </script>
@@ -15,40 +14,23 @@
         allowClear: !$input.prop('required'),
         placeholder: '{{ attr.placeholder|default('Search') }}',
         multiple: {{ multiple ? 1 : 0 }},
+        width: '100%',
         ajax: {
+            delay: 250,
             url: '{{ path('sirian_suggest', {name: suggester_name}) }}',
-                    dataType: 'json',
-                    data: function (term, page) {
+            dataType: 'json',
+            data: function (params) {
                 return {
-                    q: term,
-                    page: page,
+                    q: params.term,
                     extra: {{ extra|default({})|json_encode|raw }}
                 }
             },
-            results: function (data, page) {
+            processResults: function (data, page) {
                 return {
                     results: data.items,
                     more: data.hasMore
                 }
             }
-        },
-        initSelection: function (element, callback) {
-            if (!$input.data('suggest_initialized')) {
-                callback({{ value|json_encode|raw }});
-                $input.data('suggest_initialized', 1);
-                return;
-            }
-
-            $.ajax({
-                url: '{{ path('sirian_suggest_init', {name: suggester_name}) }}',
-                data: {
-                    ids: element.val()
-                },
-                dataType: 'json',
-                success: function (data) {
-                    callback({% if multiple %}data{% else %}data[0]{% endif %})
-                }
-            });
         }
     }
 {% endblock %}
