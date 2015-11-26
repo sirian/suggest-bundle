@@ -20,7 +20,7 @@ class SuggestTransformer implements DataTransformerInterface
     public function transform($value)
     {
         if (!$value) {
-            return $this->multiple ? [] : null;
+            return [];
         }
 
         if ($this->multiple && !(is_array($value) || $value instanceof \Traversable)) {
@@ -50,7 +50,6 @@ class SuggestTransformer implements DataTransformerInterface
         if (!$id) {
             return $this->multiple ? [] : null;
         }
-
         if ($this->multiple) {
             if (!is_array($id)) {
                 $id = explode(',', $id);
