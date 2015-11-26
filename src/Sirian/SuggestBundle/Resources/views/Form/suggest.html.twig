@@ -2,15 +2,12 @@
     {% if multiple %}
         {% set full_name = full_name ~ '[]' %}
     {% endif %}
-    <select name="{{ full_name }}" class="widgets-settings-select"{% if multiple %} multiple{% endif %} {{ block('widget_attributes') }}>
-        {% if multiple %}
-            {% for item in value %}
-                <option selected="selected" value="{{ item.id }}">{{ item.text }}</option>
-            {% endfor %}
-        {% elseif value != null %}
-            <option selected="selected" value="{{ value.id }}">{{ value.text }}</option>
-        {% endif %}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {% for item in value %}
+            <option selected="selected" value="{{ item.id }}">{{ item.text }}</option>
+        {% endfor %}
     </select>
+
     <script type="text/javascript">
         (function ($) {
             var $input = $('#{{ id }}');

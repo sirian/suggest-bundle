@@ -42,7 +42,7 @@ class SuggestTransformer implements DataTransformerInterface
             ];
         }
 
-        return $this->multiple ? $result : ($result ? $result[0] : null);
+        return $result;
     }
 
     public function reverseTransform($id)
@@ -50,9 +50,15 @@ class SuggestTransformer implements DataTransformerInterface
         if (!$id) {
             return $this->multiple ? [] : null;
         }
-        if (!is_array($id)) {
+
+        if ($this->multiple) {
+            if (!is_array($id)) {
+                $id = explode(',', $id);
+            }
+        } else {
             $id = [$id];
         }
+
         if ($id) {
             $result = $this->suggester->reverseTransform($id);
         } else {
