@@ -43,7 +43,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('class')->isRequired()->end()
                         ->scalarNode('id_property')->defaultValue('id')->end()
-                        ->scalarNode('property')->isRequired()->end()
+                        ->scalarNode('property')->defaultValue('name')->end()
                         ->arrayNode('search')
                             ->prototype('scalar')
                             ->treatNullLike('middle')
