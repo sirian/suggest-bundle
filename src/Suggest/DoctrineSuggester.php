@@ -66,13 +66,15 @@ abstract class DoctrineSuggester implements SuggesterInterface
     {
         $resolver
             ->setDefaults([
+                'id_property' => 'id',
                 'manager' => null,
                 'limit' => 20,
+                'search' => [],
                 'form_options' => []
             ])
         ;
 
-        $resolver->setRequired(['id_property', 'property', 'class', 'search']);
+        $resolver->setRequired(['property', 'class']);
 
 
         $resolver->setNormalizer('manager', function (Options $options, $manager) {

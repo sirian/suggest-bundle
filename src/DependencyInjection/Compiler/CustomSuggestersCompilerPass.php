@@ -15,7 +15,11 @@ class CustomSuggestersCompilerPass implements CompilerPassInterface
 
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $attributes) {
-                $registry->addMethodCall('addService', [$id, $attributes['alias']]);
+                if (isset($attributes['alias'])) {
+                    $registry->addMethodCall('addService', [$attributes['alias'], $id]);
+                }
+
+                $registry->addMethodCall('addService', [$container->getDefinition($id)->getClass(), $id]);
             }
         }
     }
