@@ -39,8 +39,8 @@ class EntitySuggester extends DoctrineSuggester
         $or = $qb->expr()->orX();
         foreach ($this->options['search'] as $field => $searchType) {
 
-            $suffix = in_array($searchType, ['prefix', 'middle']) ? '%' : '';
-            $prefix = in_array($searchType, ['suffix', 'middle']) ? '%' : '';
+            $suffix = in_array($searchType, [DoctrineSuggester::SEARCH_PREFIX, DoctrineSuggester::SEARCH_MIDDLE]) ? '%' : '';
+            $prefix = in_array($searchType, [DoctrineSuggester::SEARCH_SUFFIX, DoctrineSuggester::SEARCH_MIDDLE]) ? '%' : '';
             $or->add($alias . '.' . $field . ' LIKE :suggest_' . $field);
             $qb->setParameter('suggest_' . $field, $prefix . $query->searchTerm . $suffix);
         }

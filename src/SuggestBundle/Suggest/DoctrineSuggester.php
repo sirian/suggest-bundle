@@ -12,6 +12,10 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class DoctrineSuggester implements SuggesterInterface
 {
+    const SEARCH_MIDDLE = 'middle';
+    const SEARCH_PREFIX = 'prefix';
+    const SEARCH_SUFFIX = 'suffix';
+
     /**
      * @var Options
      */
@@ -64,24 +68,21 @@ abstract class DoctrineSuggester implements SuggesterInterface
             ->setDefaults([
                 'manager' => null,
                 'limit' => 20,
+                'form_options' => []
             ])
         ;
 
         $resolver->setRequired(['id_property', 'property', 'class', 'search']);
 
 
-        if (method_exists($resolver, 'setNormalizer')) {
-            $resolver->setNormalizer('manager', function (Options $options, $manager) {
-                return $this->normalize($options, $manager);
-            });
-        } else {
-            // BC
-            $resolver->setNormalizers([
-                'manager' => function (Options $options, $manager) {
-                    return $this->normalize($options, $manager);
-                }
-            ]);
-        }
+        $resolver->setNormalizer('manager', function (Options $options, $manager) {
+            return $this->normalize($options, $manager);
+        });
+    }
+
+    public function getFormOptions()
+    {
+        return $this->options['form_options'];
     }
 
     protected function normalize(Options $options, $manager)
@@ -107,7 +108,7 @@ abstract class DoctrineSuggester implements SuggesterInterface
     {
         if (empty($options['search']) && !empty($options['property'])) {
             $options['search'] = [
-                $options['property'] => 'middle'
+                $options['property'] => self::SEARCH_MIDDLE
             ];
         }
         $resolver = new OptionsResolver();
@@ -127,7 +128,6 @@ abstract class DoctrineSuggester implements SuggesterInterface
     {
         return $this->options['limit'];
     }
-
 
     /**
      * @return EntityLoaderInterface

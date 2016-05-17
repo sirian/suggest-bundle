@@ -1,0 +1,65 @@
+{% block suggest_widget %}
+    {{ block('suggest_widget_' ~ widget) }}
+{% endblock %}
+
+{% block suggest_widget_select2_v4 %}
+    not implemented yet..
+{% endblock %}
+
+{% block suggest_widget_select2_v3 %}
+<input type="text" {{ block('widget_attributes') }} value="{{ ids|join(', ') }}">
+
+<script type="text/javascript">
+    (function ($) {
+        var $input = $('#{{ id }}');
+        var options = {
+            allowClear: !$input.prop('required'),
+            placeholder: '{{ attr.placeholder|default('Search') }}',
+            multiple: {{ multiple ? 1 : 0 }},
+            ajax: {
+                url: '{{ path('sirian_suggest', {name: suggester_name}) }}',
+                dataType: 'json',
+                data: function (term, page) {
+                    return {
+                        q: term,
+                        page: page,
+                        extra: {{ extra|default({})|json_encode|raw }}
+                    }
+                },
+                results: function (data, page) {
+                    return {
+                        results: data.items,
+                        more: data.hasMore
+                    }
+                }
+            },
+            initSelection: function (element, callback) {
+                {% if value %}
+                    if (!$input.data('suggest_initialized')) {
+                        callback({{ (multiple ? value : value[0])|json_encode|raw }});
+                        $input.data('suggest_initialized', 1);
+                        return;
+                    }
+                {% endif %}
+
+                $.ajax({
+                    url: '{{ path('sirian_suggest_init', {name: suggester_name}) }}',
+                    data: {
+                        ids: element.val()
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        callback({% if multiple %}data{% else %}data[0]{% endif %})
+                    }
+                });
+            }
+        };
+
+        {% for prefix in block_prefixes %}
+            {{ block(prefix ~ '_js_hook') }}
+        {% endfor %}
+
+        $input.select2(options);
+    }(jQuery));
+</script>
+{% endblock %}

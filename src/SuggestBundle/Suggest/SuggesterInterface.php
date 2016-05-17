@@ -21,4 +21,9 @@ interface SuggesterInterface
      * @return mixed
      */
     public function reverseTransform(array $ids);
+
+    /**
+     * @return array
+     */
+    public function getFormOptions();
 }

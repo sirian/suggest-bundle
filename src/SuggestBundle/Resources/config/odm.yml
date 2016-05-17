@@ -1,5 +1,5 @@
 services:
     sirian_suggest.document_suggester:
         class: Sirian\SuggestBundle\Suggest\DocumentSuggester
-        arguments: [@doctrine_mongodb, ~]
+        arguments: ["@doctrine_mongodb", ~]
         abstract: true

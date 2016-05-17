@@ -20,8 +20,10 @@ class SirianSuggestExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+
+        $this->registerFormTheme($container);
 
         if ($config['odm']) {
             $loader->load('odm.yml');
@@ -32,8 +34,12 @@ class SirianSuggestExtension extends Extension
             $loader->load('orm.yml');
             $this->registerDoctrineSuggesters($container, $config['orm'], 'sirian_suggest.entity_suggester', $config['form_options']);
         }
+    }
 
-        $this->registerCustomSuggesters($container, $config['custom'], $config['form_options']);
+    protected function registerFormTheme(ContainerBuilder $container)
+    {
+        $resources = $container->getParameter('twig.form.resources');
+        $container->setParameter('twig.form.resources', array_merge(['SirianSuggestBundle:Form:suggest.html.twig'], $resources));
     }
 
     protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService, $formOptions)
@@ -48,6 +54,7 @@ class SirianSuggestExtension extends Extension
                     'id_property' => $config['id_property'],
                     'property' => $config['property'],
                     'search' => $config['search'],
+                    'form_options' => array_replace($formOptions, $config['form_options'])
                 ])
             ;
 
@@ -56,33 +63,6 @@ class SirianSuggestExtension extends Extension
             $registry->addMethodCall('addService', [$id, $suggesterId]);
 
             $container->setDefinition($suggesterId, $definition);
-
-            $this->registerFormType($container, $suggesterId, $id, array_merge($formOptions, $config['form_options']));
-        }
-    }
-
-    protected function registerFormType(ContainerBuilder $container, $suggesterId, $suggesterName, $defaultOptions)
-    {
-        $name = 'suggest_' . $suggesterName;
-
-        $formType = new DefinitionDecorator('sirian_suggest.suggest_form_type');
-        $formType
-            ->replaceArgument(0, new Reference($suggesterId))
-            ->replaceArgument(1, $suggesterName)
-            ->replaceArgument(2, $name)
-            ->replaceArgument(3, $defaultOptions)
-            ->addTag('form.type', ['alias' => $name])
-        ;
-
-        $container->setDefinition('form.type.' . $name, $formType);
-    }
-
-    private function registerCustomSuggesters(ContainerBuilder $container, $config, $formOptions)
-    {
-        $registry = $container->getDefinition('sirian_suggest.registry');
-        foreach ($config as $id => $params) {
-            $registry->addMethodCall('addService', [$id, $params['suggester']]);
-            $this->registerFormType($container, $params['suggester'], $id, array_merge($formOptions, $params['form_options']));
         }
     }
 }

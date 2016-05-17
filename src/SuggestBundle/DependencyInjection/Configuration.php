@@ -2,6 +2,7 @@
 
 namespace Sirian\SuggestBundle\DependencyInjection;
 
+use Sirian\SuggestBundle\Suggest\DoctrineSuggester;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -24,20 +25,6 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
 
-                ->arrayNode('custom')
-                ->useAttributeAsKey('id')
-                ->prototype('array')
-                    ->beforeNormalization()->ifString()->then(function ($value) {
-                        return [
-                            'suggester' => $value
-                        ];
-                    })->end()
-                    ->children()
-                        ->scalarNode('suggester')->end()
-                        ->arrayNode('form_options')
-                            ->prototype('variable')
-                            ->end()
-                        ->end()
 
 
         ;
@@ -47,6 +34,7 @@ class Configuration implements ConfigurationInterface
 
     public function addConfiguration(ArrayNodeDefinition $rootNode, $name)
     {
+        $searchTypes = [DoctrineSuggester::SEARCH_PREFIX, DoctrineSuggester::SEARCH_MIDDLE, DoctrineSuggester::SEARCH_SUFFIX];
         $rootNode
             ->children()
                 ->arrayNode($name)
@@ -60,8 +48,8 @@ class Configuration implements ConfigurationInterface
                             ->prototype('scalar')
                             ->treatNullLike('middle')
                                 ->validate()
-                                    ->ifNotInArray(['prefix', 'suffix', 'middle'])
-                                    ->thenInvalid('Available search types: "prefix", "suffix", "middle"')
+                                    ->ifNotInArray($searchTypes)
+                                    ->thenInvalid('Available search types: ' . implode(',', $searchTypes))
                                 ->end()
                             ->end()
                         ->end()
