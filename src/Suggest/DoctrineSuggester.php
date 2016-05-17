@@ -70,11 +70,12 @@ abstract class DoctrineSuggester implements SuggesterInterface
                 'manager' => null,
                 'limit' => 20,
                 'search' => [],
-                'form_options' => []
+                'form_options' => [],
+                'property' => 'name'
             ])
         ;
 
-        $resolver->setRequired(['property', 'class']);
+        $resolver->setRequired(['class']);
 
 
         $resolver->setNormalizer('manager', function (Options $options, $manager) {
