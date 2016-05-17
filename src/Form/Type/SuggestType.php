@@ -37,9 +37,19 @@ class SuggestType extends AbstractType
         $pos = array_search($this->getBlockPrefix(), $view->vars['block_prefixes']);
         array_splice($view->vars['block_prefixes'], $pos + 1, 0, $suggesterName . '_suggest');
 
-        $ids = array_map(function ($item) {
-            return $item['id'];
-        }, $view->vars['value']);
+        $value = $view->vars['value'];
+
+        $ids = [];
+
+        if ($options['multiple']) {
+            $ids = array_map(function ($item) {
+                return $item['id'];
+            }, $view->vars['value']);
+        } elseif ($value) {
+            $ids = [$value['id']];
+        }
+
+
 
         $view->vars = array_merge([
             'ids' => $ids,

@@ -2,6 +2,7 @@
 
 namespace Sirian\SuggestBundle\Form\DataTransformer;
 
+use Sirian\SuggestBundle\Suggest\Item;
 use Sirian\SuggestBundle\Suggest\SuggesterInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -20,7 +21,7 @@ class SuggestTransformer implements DataTransformerInterface
     public function transform($value)
     {
         if (!$value) {
-            return [];
+            return null;
         }
 
         if ($this->multiple && !(is_array($value) || $value instanceof \Traversable)) {
@@ -35,14 +36,27 @@ class SuggestTransformer implements DataTransformerInterface
 
         $result = [];
         foreach ($items as $item) {
-            $result[] = [
-                'id' => $item->id,
-                'text' => $item->text,
-                'extra' => $item->extra
-            ];
+            $result[] = $this->transform($item);
         }
 
-        return $result;
+        if ($this->multiple) {
+            return $result;
+        }
+
+        if (!$result) {
+            return null;
+        }
+
+        return $result[0];
+    }
+
+    protected function transformItem(Item $item)
+    {
+        return [
+            'id' => $item->id,
+            'text' => $item->text,
+            'extra' => $item->extra
+        ];
     }
 
     public function reverseTransform($id)
@@ -52,7 +66,7 @@ class SuggestTransformer implements DataTransformerInterface
         }
         if ($this->multiple) {
             if (!is_array($id)) {
-                $id = explode(',', $id);
+                $id = preg_split('/\s*,\s*/', $id, null, PREG_SPLIT_NO_EMPTY);
             }
         } else {
             $id = [$id];
@@ -63,7 +77,13 @@ class SuggestTransformer implements DataTransformerInterface
         } else {
             $result = [];
         }
+        
+        if ($this->multiple) {
+            return $result;
+        }
+        
+        
 
-        return $this->multiple ? $result : ($result ? $result[0] : null);
+        return $result ? $result[0] : null;
     }
 }

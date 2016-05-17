@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block suggest_widget_select2_v3 %}
-<input type="text" {{ block('widget_attributes') }} value="{{ ids|join(', ') }}">
+<input type="text" {{ block('widget_attributes') }} value="{{ ids|join(',') }}">
 
 <script type="text/javascript">
     (function ($) {
@@ -15,7 +15,7 @@
         var options = {
             allowClear: !$input.prop('required'),
             placeholder: '{{ attr.placeholder|default('Search') }}',
-            multiple: {{ multiple ? 1 : 0 }},
+            multiple: {{ multiple ? 'true' : 'false' }},
             ajax: {
                 url: '{{ path('sirian_suggest', {name: suggester_name}) }}',
                 dataType: 'json',
@@ -36,7 +36,7 @@
             initSelection: function (element, callback) {
                 {% if value %}
                     if (!$input.data('suggest_initialized')) {
-                        callback({{ (multiple ? value : value[0])|json_encode|raw }});
+                        callback({{ value|json_encode|raw }});
                         $input.data('suggest_initialized', 1);
                         return;
                     }
