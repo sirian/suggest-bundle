@@ -36,7 +36,7 @@ class SuggestTransformer implements DataTransformerInterface
 
         $result = [];
         foreach ($items as $item) {
-            $result[] = $this->transform($item);
+            $result[] = $this->transformItem($item);
         }
 
         if ($this->multiple) {
@@ -77,12 +77,12 @@ class SuggestTransformer implements DataTransformerInterface
         } else {
             $result = [];
         }
-        
+
         if ($this->multiple) {
             return $result;
         }
-        
-        
+
+
 
         return $result ? $result[0] : null;
     }
