@@ -31,11 +31,11 @@ class SuggestType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $suggesterName = $options['suggester'];
+        $alias = $this->registry->getAlias($options['suggester']);
 
         // add "entity_suggest" block prefixes to simplify form styling
         $pos = array_search($this->getBlockPrefix(), $view->vars['block_prefixes']);
-        array_splice($view->vars['block_prefixes'], $pos + 1, 0, $suggesterName . '_suggest');
+        array_splice($view->vars['block_prefixes'], $pos + 1, 0, $alias . '_suggest');
 
         $value = $view->vars['value'];
 
@@ -54,7 +54,7 @@ class SuggestType extends AbstractType
         $view->vars = array_merge([
             'ids' => $ids,
             'multiple' => $options['multiple'],
-            'suggester_name' => $suggesterName,
+            'alias' => $alias,
             'widget' => $options['widget'],
             'extra' => $options['extra']
         ], $view->vars);

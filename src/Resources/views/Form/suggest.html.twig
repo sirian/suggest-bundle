@@ -17,7 +17,7 @@
             placeholder: '{{ attr.placeholder|default('Search') }}',
             multiple: {{ multiple ? 'true' : 'false' }},
             ajax: {
-                url: '{{ path('sirian_suggest', {name: suggester_name}) }}',
+                url: '{{ path('sirian_suggest', {name: alias}) }}',
                 dataType: 'json',
                 data: function (term, page) {
                     return {
@@ -43,7 +43,7 @@
                 {% endif %}
 
                 $.ajax({
-                    url: '{{ path('sirian_suggest_init', {name: suggester_name}) }}',
+                    url: '{{ path('sirian_suggest_init', {name: alias}) }}',
                     data: {
                         ids: element.val()
                     },

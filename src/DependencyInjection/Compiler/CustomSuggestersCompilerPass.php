@@ -14,12 +14,15 @@ class CustomSuggestersCompilerPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds('sirian_suggest.suggester');
 
         foreach ($taggedServices as $id => $tags) {
+            $registry->addMethodCall('addService', [$container->getDefinition($id)->getClass(), $id]);
+
             foreach ($tags as $attributes) {
-                if (isset($attributes['alias'])) {
-                    $registry->addMethodCall('addService', [$attributes['alias'], $id]);
+                if (!isset($attributes['alias'])) {
+                    continue;
                 }
 
-                $registry->addMethodCall('addService', [$container->getDefinition($id)->getClass(), $id]);
+                $registry->addMethodCall('setServiceAlias', [$id, $attributes['alias']]);
+                $registry->addMethodCall('addService', [$attributes['alias'], $id]);
             }
         }
     }
