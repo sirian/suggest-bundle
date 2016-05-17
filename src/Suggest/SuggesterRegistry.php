@@ -61,7 +61,6 @@ class SuggesterRegistry
     {
         $suggester = $this->get($name);
         $hash = spl_object_hash($suggester);
-        dump($this->suggesterAlias);
         return isset($this->suggesterAlias[$hash]) ? $this->suggesterAlias[$hash] : $name;
     }
 }
