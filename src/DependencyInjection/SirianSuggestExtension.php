@@ -27,13 +27,15 @@ class SirianSuggestExtension extends Extension
 
         if ($config['odm']) {
             $loader->load('odm.yml');
-            $this->registerDoctrineSuggesters($container, $config['odm'], 'sirian_suggest.document_suggester', $config['form_options']);
+            $this->registerDoctrineSuggesters($container, $config['odm'], 'sirian_suggest.document_suggester');
         }
 
         if ($config['orm']) {
             $loader->load('orm.yml');
-            $this->registerDoctrineSuggesters($container, $config['orm'], 'sirian_suggest.entity_suggester', $config['form_options']);
+            $this->registerDoctrineSuggesters($container, $config['orm'], 'sirian_suggest.entity_suggester');
         }
+
+        $container->getDefinition('sirian_suggest.suggest_form_type')->replaceArgument(1, $config['form_options']);
     }
 
     protected function registerFormTheme(ContainerBuilder $container)
@@ -42,7 +44,7 @@ class SirianSuggestExtension extends Extension
         $container->setParameter('twig.form.resources', array_merge(['SirianSuggestBundle:Form:suggest.html.twig'], $resources));
     }
 
-    protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService, $formOptions)
+    protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService)
     {
         $registry = $container->getDefinition('sirian_suggest.registry');
 
@@ -54,7 +56,7 @@ class SirianSuggestExtension extends Extension
                     'id_property' => $config['id_property'],
                     'property' => $config['property'],
                     'search' => $config['search'],
-                    'form_options' => array_replace($formOptions, $config['form_options'])
+                    'form_options' => $config['form_options']
                 ])
             ;
 

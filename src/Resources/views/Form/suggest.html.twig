@@ -3,7 +3,51 @@
 {% endblock %}
 
 {% block suggest_widget_select2_v4 %}
-    not implemented yet..
+    {% if multiple %}
+        {% set full_name = full_name ~ '[]' %}
+    {% endif %}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {% for item in values %}
+            <option selected="selected" value="{{ item.id }}">{{ item.text }}</option>
+        {% endfor %}
+    </select>
+
+    <script type="text/javascript">
+        (function ($) {
+            var $input = $('#{{ id }}');
+
+            var options = {
+                allowClear: !$input.prop('required'),
+                placeholder: '{{ attr.placeholder|default('Search') }}',
+                multiple: {{ multiple ? 'true' : 'false' }},
+                data: {{ values|json_encode|raw }},
+                ajax: {
+                    url: '{{ path('sirian_suggest', {name: alias}) }}',
+                    dataType: 'json',
+                    data: function (params) {
+                        return {
+                            q: params.term,
+                            page: params.page,
+                            extra: {{ extra|default({})|json_encode|raw }}
+                        }
+                    },
+                    processResults: function (data, page) {
+                        return {
+                            results: data.items,
+                            pagination: {
+                                more: data.hasMore
+                            }
+                        }
+                    }
+                }
+            };
+
+            {{ block('suggest_js_hooks')|raw }}
+
+            $input.select2(options);
+        }(jQuery));
+    </script>
+
 {% endblock %}
 
 {% block suggest_widget_select2_v3 %}
@@ -55,11 +99,20 @@
             }
         };
 
-        {% for prefix in block_prefixes %}
-            {{ block(prefix ~ '_js_hook') }}
-        {% endfor %}
+        {{ block('suggest_js_hooks')|raw }}
 
         $input.select2(options);
     }(jQuery));
 </script>
+{% endblock %}
+
+{% block suggest_js_hooks %}
+    {% set hook = '' %}
+
+    {% for prefix in block_prefixes|reverse if not hook %}
+        {% set blockName = prefix ~ '_js_hook' %}
+        {% set hook = block(blockName) %}
+    {% endfor %}
+
+    {{ hook|raw }}
 {% endblock %}

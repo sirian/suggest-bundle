@@ -18,10 +18,15 @@ class SuggestType extends AbstractType
      * @var SuggesterRegistry
      */
     private $registry;
+    /**
+     * @var array
+     */
+    private $defaultOptions;
 
-    public function __construct(SuggesterRegistry $registry)
+    public function __construct(SuggesterRegistry $registry, array $defaultOptions = [])
     {
         $this->registry = $registry;
+        $this->defaultOptions = $defaultOptions;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -40,22 +45,20 @@ class SuggestType extends AbstractType
 
         $value = $view->vars['value'];
 
-        $ids = [];
+        $values = [];
 
         if (null !== $value) {
-            if ($options['multiple']) {
-                $ids = array_map(function ($item) {
-                    return $item['id'];
-                }, $view->vars['value']);
-            } else {
-                $ids = [$value['id']];
-            }
+            $values = $options['multiple'] ? $value : [$value];
         }
 
+        $ids = array_map(function ($item) {
+            return $item['id'];
+        }, $values);
 
 
         $view->vars = array_merge([
             'ids' => $ids,
+            'values' => $values,
             'multiple' => $options['multiple'],
             'alias' => $alias,
             'widget' => $options['widget'],
@@ -67,12 +70,12 @@ class SuggestType extends AbstractType
     {
         $resolver->setRequired('suggester');
 
-        $resolver->setDefaults(array_merge([
+        $resolver->setDefaults(array_replace([
             'widget' => 'select2_v3',
             'compound' => false,
             'multiple' => false,
             'extra' => []
-        ]));
+        ], $this->defaultOptions));
     }
 
     public function getBlockPrefix()
