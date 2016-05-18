@@ -86,10 +86,15 @@
                     }
                 {% endif %}
 
+                var ids = element.val();
+                {% if multiple %}
+                    ids = ids.split(',');
+                {% endif %}
+
                 $.ajax({
                     url: '{{ path('sirian_suggest_init', {name: alias}) }}',
                     data: {
-                        ids: element.val()
+                        ids: ids
                     },
                     dataType: 'json',
                     success: function (data) {
