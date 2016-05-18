@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class SuggestType extends AbstractType
 {
@@ -72,5 +73,21 @@ class SuggestType extends AbstractType
             'multiple' => false,
             'extra' => []
         ]));
+    }
+
+    public function getBlockPrefix()
+    {
+        return 'suggest';
+    }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $this->configureOptions($resolver);
+    }
+
+
+    public function getName()
+    {
+        return 'suggest';
     }
 }
