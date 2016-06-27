@@ -1,5 +1,5 @@
 services:
     sirian_suggest.entity_suggester:
         class: Sirian\SuggestBundle\Suggest\EntitySuggester
-        arguments: [@doctrine, ~]
+        arguments: ["@doctrine", ~]
         abstract: true
