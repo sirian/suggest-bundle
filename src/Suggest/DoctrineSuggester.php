@@ -70,10 +70,18 @@ abstract class DoctrineSuggester implements SuggesterInterface
                 'manager' => null,
                 'limit' => 20,
                 'search' => [],
-                'form_options' => [],
                 'property' => 'name'
             ])
         ;
+
+        $resolver->setNormalizer('search', function (Options $options, $value) {
+            if (empty($value) && !empty($options['property'])) {
+                $value = [
+                    $options['property'] => self::SEARCH_MIDDLE
+                ];
+            }
+            return $value;
+        });
 
         $resolver->setRequired(['class']);
 
@@ -81,11 +89,6 @@ abstract class DoctrineSuggester implements SuggesterInterface
         $resolver->setNormalizer('manager', function (Options $options, $manager) {
             return $this->normalize($options, $manager);
         });
-    }
-
-    public function getFormOptions()
-    {
-        return $this->options['form_options'];
     }
 
     protected function normalize(Options $options, $manager)
@@ -109,11 +112,6 @@ abstract class DoctrineSuggester implements SuggesterInterface
 
     protected function prepareOptions($options)
     {
-        if (empty($options['search']) && !empty($options['property'])) {
-            $options['search'] = [
-                $options['property'] => self::SEARCH_MIDDLE
-            ];
-        }
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         return $resolver->resolve($options);

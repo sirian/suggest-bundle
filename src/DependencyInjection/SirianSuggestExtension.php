@@ -55,8 +55,7 @@ class SirianSuggestExtension extends Extension
                     'class' => $config['class'],
                     'id_property' => $config['id_property'],
                     'property' => $config['property'],
-                    'search' => $config['search'],
-                    'form_options' => $config['form_options']
+                    'search' => $config['search']
                 ])
             ;
 
