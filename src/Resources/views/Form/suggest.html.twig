@@ -59,6 +59,7 @@
 <script type="text/javascript">
     (function ($) {
         var $input = $('#{{ id }}');
+        var initialized = false;
         var options = {
             allowClear: !$input.prop('required'),
             placeholder: '{{ attr.placeholder|default('Search') }}',
@@ -83,9 +84,9 @@
             },
             initSelection: function (element, callback) {
                 {% if value %}
-                    if (!$input.data('suggest_initialized')) {
+                    if (!initialized) {
                         callback({{ value|json_encode|raw }});
-                        $input.data('suggest_initialized', 1);
+                        initialized = true;
                         return;
                     }
                 {% endif %}
