@@ -181,3 +181,102 @@ security:
         - { path: ^/suggest/category, roles: ROLE_USER }
         - { path: ^/suggest, roles: ROLE_ADMIN }
 ```
+
+### 6. Passing additional options to suggester
+
+Sometimes you need to pass additional parameters to `Suggester`. 
+   
+ 
+#### 6.1. Static extra options
+ 
+ Let's start with simple example. You have `brands` and `models` and you want to display only models for one specific brand.
+ Create class `ModelSuggester`
+
+```php
+<?php
+
+namespace App\MainBundle\Suggest;
+
+use App\MainBundle\Document\Model;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Sirian\SuggestBundle\Suggest\DocumentSuggester;
+use Sirian\SuggestBundle\Suggest\SuggestQuery;
+
+class ModelSuggester extends DocumentSuggester
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        $options = [
+            'class' => Model::class,
+            'id_property' => 'id',
+            'property' => 'name',
+        ];
+
+        parent::__construct($registry, $options);
+    }
+
+    protected function createSuggestQueryBuilder(SuggestQuery $query)
+    {
+        $qb = parent::createSuggestQueryBuilder($query);
+        
+        $brandId = $query->extra['brand_id'];
+        
+        $qb->field('brand')->equals($brandId);
+        
+        return $qb;
+    }
+}
+```
+
+Define service
+```yaml
+    app.suggester.model:
+        class: App\MainBundle\Suggest\ModelSuggester
+        arguments: ["@doctrine_mongodb"]
+        tags: 
+            - {name: 'sirian_suggest.suggester', alias: 'model'}
+```
+
+and add `extra` option to form options:
+```php
+$formBuilder->add('model', SuggestType::class, [
+    'suggester' => 'model',
+    'extra' => [
+        'brand_id' => 123
+    ]
+])
+```
+
+
+#### 6.2. Dynamic extra options
+
+Now let's see an example when you have 2 suggest fields `brand` and `model` and in second select you want to display models for selected brand.
+
+You need to create `ModelSuggester` and define suggester service (like in previous section).
+
+And then customize form widget to pass `brand_id` extra option to suggester   
+
+```twig
+{% block _form_model_widget %}
+    {{ form_widget(form) }}
+    
+    <script>
+        (function () {
+            // get prepared options for select2
+            var options = $('#{{ id }}').data('suggest-options');
+            
+            // update ajax.data option 
+            options.ajax.data = function (term, page) {
+                return {
+                    q: term,
+                    page: page,
+                    extra: {
+                        brand_id: $('#form_brand').val() // get brand_id from another select 
+                    }
+                }
+            }
+        }());
+    </script>
+{% endblock %}
+```
+ 
