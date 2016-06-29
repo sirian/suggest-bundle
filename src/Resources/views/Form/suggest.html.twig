@@ -20,6 +20,7 @@
                 allowClear: !$input.prop('required'),
                 placeholder: '{{ attr.placeholder|default('Search') }}',
                 multiple: {{ multiple ? 'true' : 'false' }},
+                closeOnSelect: {{ multiple ? 0 : 1 }},
                 data: {{ values|json_encode|raw }},
                 ajax: {
                     url: '{{ path('sirian_suggest', {name: alias}) }}',
@@ -42,9 +43,11 @@
                 }
             };
 
-            {{ block('suggest_js_hooks')|raw }}
+            $input.data('suggest-options', options);
 
-            $input.select2(options);
+            setTimeout(function () {
+                $input.select2($input.data('suggest-options'));
+            }, 0);
         }(jQuery));
     </script>
 
@@ -60,6 +63,7 @@
             allowClear: !$input.prop('required'),
             placeholder: '{{ attr.placeholder|default('Search') }}',
             multiple: {{ multiple ? 'true' : 'false' }},
+            closeOnSelect: {{ multiple ? 0 : 1 }},
             ajax: {
                 url: '{{ path('sirian_suggest', {name: alias}) }}',
                 dataType: 'json',
@@ -104,20 +108,11 @@
             }
         };
 
-        {{ block('suggest_js_hooks')|raw }}
+        $input.data('suggest-options', options);
 
-        $input.select2(options);
+        setTimeout(function () {
+            $input.select2($input.data('suggest-options'));
+        }, 0);
     }(jQuery));
 </script>
-{% endblock %}
-
-{% block suggest_js_hooks %}
-    {% set hook = '' %}
-
-    {% for prefix in block_prefixes|reverse if not hook %}
-        {% set blockName = prefix ~ '_js_hook' %}
-        {% set hook = block(blockName) %}
-    {% endfor %}
-
-    {{ hook|raw }}
 {% endblock %}
