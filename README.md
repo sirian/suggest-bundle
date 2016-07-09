@@ -119,7 +119,11 @@ class AdminSuggester extends DocumentSuggester
             'class' => User::class,
             'id_property' => 'id',
             'property' => 'username',
-            'search' => ['name' => 1, 'username' => 1, 'email' => 1]
+            'search' => [
+                'name' => DocumentSuggester::SEARCH_MIDDLE,
+                'username' => DocumentSuggester::SEARCH_MIDDLE,
+                'email' => DocumentSuggester::SEARCH_MIDDLE
+            ]
         ];
 
         parent::__construct($registry, $options);
