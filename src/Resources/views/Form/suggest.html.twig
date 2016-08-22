@@ -47,6 +47,9 @@
 
             setTimeout(function () {
                 $input.select2($input.data('suggest-options'));
+                {% if ids %}
+                $input.val({{ (multiple ? ids : ids[0])|json_encode|raw }}).trigger('change');
+                {% endif %}
             }, 0);
         }(jQuery));
     </script>
