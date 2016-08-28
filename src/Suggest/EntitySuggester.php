@@ -41,8 +41,16 @@ class EntitySuggester extends DoctrineSuggester
 
             $suffix = in_array($searchType, [DoctrineSuggester::SEARCH_PREFIX, DoctrineSuggester::SEARCH_MIDDLE]) ? '%' : '';
             $prefix = in_array($searchType, [DoctrineSuggester::SEARCH_SUFFIX, DoctrineSuggester::SEARCH_MIDDLE]) ? '%' : '';
-            $or->add($alias . '.' . $field . ' LIKE :suggest_' . $field);
-            $qb->setParameter('suggest_' . $field, $prefix . $query->searchTerm . $suffix);
+            $fieldLiteral = $alias . '.' . $field;
+            $valueLiteral = $prefix . $query->searchTerm . $suffix;
+
+            if ($this->options['case_insensitive']) {
+                $fieldLiteral = 'LOWER(' . $fieldLiteral . ')';
+                $valueLiteral = strtolower($valueLiteral);
+            }
+
+            $or->add($fieldLiteral . ' LIKE :suggest_' . $field);
+            $qb->setParameter('suggest_' . $field, $valueLiteral);
         }
 
         $qb
