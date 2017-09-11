@@ -9,7 +9,7 @@
     "require": {
         "php": ">=5.4.0"
     },
-    "suggests" : {
+    "suggests": {
         "symfony/framework-bundle": "To use with Symfony framework",
         "symfony/form": "To use with Symfony framework",
         "doctrine/doctrine-bundle": "To use with Doctrine"
