@@ -4,9 +4,7 @@ namespace Sirian\SuggestBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -49,7 +47,7 @@ class SirianSuggestExtension extends Extension
         $registry = $container->getDefinition('sirian_suggest.registry');
 
         foreach ($suggesterConfigs as $id => $config) {
-            $definition = new DefinitionDecorator($parentService);
+            $definition = new ChildDefinition($parentService);
             $definition
                 ->replaceArgument(1, [
                     'class' => $config['class'],
