@@ -39,7 +39,7 @@ class SirianSuggestExtension extends Extension
     protected function registerFormTheme(ContainerBuilder $container)
     {
         $resources = $container->getParameter('twig.form.resources');
-        $container->setParameter('twig.form.resources', array_merge(['SirianSuggestBundle:Form:suggest.html.twig'], $resources));
+        $container->setParameter('twig.form.resources', array_merge(['@SirianSuggest/Form/suggest.html.twig'], $resources));
     }
 
     protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService)
