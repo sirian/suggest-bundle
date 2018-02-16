@@ -2,6 +2,7 @@ services:
     sirian_suggest.registry:
         class: Sirian\SuggestBundle\Suggest\SuggesterRegistry
         arguments: ["@service_container"]
+        public: true
 
     sirian_suggest.form.extension:
         class: Sirian\SuggestBundle\DependencyInjection\SirianSuggestExtension

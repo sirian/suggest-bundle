@@ -4,14 +4,14 @@ namespace Sirian\SuggestBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
 class SirianSuggestExtension extends Extension
 {
+    const VERSION_4_COMPATIBLE_DIFINITION = 'Symfony\Component\DependencyInjection\ChildDefinition';
+    const LEGACY_COMPATIBLE_DIFINITION = 'Symfony\Component\DependencyInjection\DefinitionDecorator';
+
     /**
      * {@inheritDoc}
      */
@@ -41,15 +41,21 @@ class SirianSuggestExtension extends Extension
     protected function registerFormTheme(ContainerBuilder $container)
     {
         $resources = $container->getParameter('twig.form.resources');
-        $container->setParameter('twig.form.resources', array_merge(['SirianSuggestBundle:Form:suggest.html.twig'], $resources));
+        $container->setParameter('twig.form.resources', array_merge(['@SirianSuggest/Form/suggest.html.twig'], $resources));
     }
 
     protected function registerDoctrineSuggesters(ContainerBuilder $container, $suggesterConfigs, $parentService)
     {
         $registry = $container->getDefinition('sirian_suggest.registry');
 
+        if (class_exists(self::VERSION_4_COMPATIBLE_DIFINITION)) {
+            $definition = self::VERSION_4_COMPATIBLE_DIFINITION;
+        } else {
+            $definition = self::LEGACY_COMPATIBLE_DIFINITION;
+        }
+
         foreach ($suggesterConfigs as $id => $config) {
-            $definition = new DefinitionDecorator($parentService);
+            $definition = new $definition($parentService);
             $definition
                 ->replaceArgument(1, [
                     'class' => $config['class'],
@@ -58,11 +64,9 @@ class SirianSuggestExtension extends Extension
                     'search' => $config['search']
                 ])
             ;
-
+            $definition->setPublic(true);
             $suggesterId = 'sirian_suggest.odm.' . $id;
-
             $registry->addMethodCall('addService', [$id, $suggesterId]);
-
             $container->setDefinition($suggesterId, $definition);
         }
     }
