@@ -35,11 +35,18 @@ class DocumentSuggester extends DoctrineSuggester
 
         $or = $qb->expr();
         foreach ($this->options['search'] as $field => $searchType) {
-
             $prefix = $searchType == DocumentSuggester::SEARCH_PREFIX ? '^' : '';
             $suffix = $searchType == DocumentSuggester::SEARCH_SUFFIX ? '$' : '';
 
-            $or->addOr($qb->expr()->field($field)->equals(new \MongoRegex('/' . $prefix . preg_quote($query->searchTerm) . $suffix . '/i')));
+            $searchTerm = $prefix . preg_quote($query->searchTerm) . $suffix;
+            $flags = 'i';
+            if (class_exists('MongoDB\BSON\Regex')) {
+                $regex = new \MongoDB\BSON\Regex($searchTerm, $flags);
+            } else {
+                $regex = new \MongoRegex('/' . $searchTerm . '/' . $flags);
+            }
+
+            $or->addOr($qb->expr()->field($field)->equals($regex));
         }
 
 
