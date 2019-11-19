@@ -9,8 +9,8 @@ use Symfony\Component\DependencyInjection\Loader;
 
 class SirianSuggestExtension extends Extension
 {
-    const VERSION_4_COMPATIBLE_DIFINITION = 'Symfony\Component\DependencyInjection\ChildDefinition';
-    const LEGACY_COMPATIBLE_DIFINITION = 'Symfony\Component\DependencyInjection\DefinitionDecorator';
+    const VERSION_4_COMPATIBLE_DEFINITION = 'Symfony\Component\DependencyInjection\ChildDefinition';
+    const LEGACY_COMPATIBLE_DEFINITION = 'Symfony\Component\DependencyInjection\DefinitionDecorator';
 
     /**
      * {@inheritDoc}
@@ -48,10 +48,10 @@ class SirianSuggestExtension extends Extension
     {
         $registry = $container->getDefinition('sirian_suggest.registry');
 
-        if (class_exists(self::VERSION_4_COMPATIBLE_DIFINITION)) {
-            $definition = self::VERSION_4_COMPATIBLE_DIFINITION;
+        if (class_exists(self::VERSION_4_COMPATIBLE_DEFINITION)) {
+            $definition = self::VERSION_4_COMPATIBLE_DEFINITION;
         } else {
-            $definition = self::LEGACY_COMPATIBLE_DIFINITION;
+            $definition = self::LEGACY_COMPATIBLE_DEFINITION;
         }
 
         foreach ($suggesterConfigs as $id => $config) {
