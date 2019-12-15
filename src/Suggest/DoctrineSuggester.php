@@ -70,7 +70,8 @@ abstract class DoctrineSuggester implements SuggesterInterface
                 'manager' => null,
                 'limit' => 20,
                 'search' => [],
-                'property' => 'name'
+                'property' => 'name',
+                'case_insensitive' => false
             ])
         ;
 

@@ -14,9 +14,9 @@
         "symfony/form": "To use with Symfony framework",
         "doctrine/doctrine-bundle": "To use with Doctrine"
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.x-dev"
-        }
+    "extra": {		
+        "branch-alias": {		
+            "dev-master": "2.0.x-dev"		
+        }		
     }
 }
