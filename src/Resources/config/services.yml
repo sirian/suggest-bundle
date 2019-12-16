@@ -1,8 +1,13 @@
 services:
+    sirian_suggest.controller:
+        class: Sirian\SuggestBundle\Controller\SuggestController
+        arguments: ["@sirian_suggest.registry"]
+        public: true
+
     sirian_suggest.registry:
         class: Sirian\SuggestBundle\Suggest\SuggesterRegistry
-        arguments: ["@service_container"]
         public: true
+        arguments: ["@service_container"]
 
     sirian_suggest.form.extension:
         class: Sirian\SuggestBundle\DependencyInjection\SirianSuggestExtension

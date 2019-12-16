@@ -2,6 +2,7 @@
 
 namespace Sirian\SuggestBundle\Suggest;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SuggesterRegistry
@@ -17,50 +18,46 @@ class SuggesterRegistry
         $this->container = $container;
     }
 
-    public function addService($name, $serviceName)
+    public function addService(string $name, string $serviceName)
     {
         $this->suggesterServices[$name] = $serviceName;
     }
 
-    public function setServiceAlias($serviceName, $alias)
+    public function setServiceAlias(string $serviceName, string $alias)
     {
         $this->serviceAliases[$serviceName] = $alias;
     }
 
-    public function has($name)
+    public function has(string $name): bool
     {
         return isset($this->suggesters[$name]) || isset($this->suggesterServices[$name]);
     }
 
-    /**
-     * @param $name
-     * @return SuggesterInterface
-     * @throws \InvalidArgumentException
-     */
-    public function get($name)
+    public function get(string $name): SuggesterInterface
     {
         if (isset($this->suggesters[$name])) {
             return $this->suggesters[$name];
         }
 
-        if (isset($this->suggesterServices[$name])) {
-            $serviceName = $this->suggesterServices[$name];
+        if (!isset($this->suggesterServices[$name])) {
+            throw new \InvalidArgumentException(sprintf('Suggester "%s" not registered', $name));
+        }
+        $serviceName = $this->suggesterServices[$name];
 
-            $suggester = $this->container->get($serviceName);
-            if (isset($this->serviceAliases[$serviceName])) {
-                $this->suggesterAlias[spl_object_hash($suggester)] = $this->serviceAliases[$serviceName];
-            }
-            $this->suggesters[$name] = $suggester;
-            return $this->suggesters[$name];
+        $suggester = $this->container->get($serviceName);
+
+        if (isset($this->serviceAliases[$serviceName])) {
+            $this->suggesterAlias[spl_object_id($suggester)] = $this->serviceAliases[$serviceName];
         }
 
-        throw new \InvalidArgumentException(sprintf('Suggester "%s" not registered', $name));
+        $this->suggesters[$name] = $suggester;
+        return $this->suggesters[$name];
     }
 
-    public function getAlias($name)
+    public function getAlias(string $name)
     {
         $suggester = $this->get($name);
-        $hash = spl_object_hash($suggester);
-        return isset($this->suggesterAlias[$hash]) ? $this->suggesterAlias[$hash] : $name;
+        $hash = spl_object_id($suggester);
+        return $this->suggesterAlias[$hash] ?? $name;
     }
 }

@@ -3,15 +3,22 @@
 namespace Sirian\SuggestBundle\Controller;
 
 use Sirian\SuggestBundle\Suggest\SuggesterInterface;
+use Sirian\SuggestBundle\Suggest\SuggesterRegistry;
 use Sirian\SuggestBundle\Suggest\SuggestQuery;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class SuggestController extends Controller
+class SuggestController
 {
-    public function suggestAction(Request $request, $name)
+    protected $registry;
+
+    public function __construct(SuggesterRegistry $registry)
+    {
+        $this->registry = $registry;
+    }
+
+    public function suggest(Request $request, $name): JsonResponse
     {
         $suggester = $this->getSuggester($name);
 
@@ -26,7 +33,7 @@ class SuggestController extends Controller
         return new JsonResponse($result->toArray());
     }
 
-    public function initAction(Request $request, $name)
+    public function init(Request $request, $name): JsonResponse
     {
         $suggester = $this->getSuggester($name);
 
@@ -40,17 +47,11 @@ class SuggestController extends Controller
         return new JsonResponse($suggester->transform($objects));
     }
 
-    /**
-     * @param $name
-     * @return SuggesterInterface
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
-    protected function getSuggester($name)
+    protected function getSuggester($name): SuggesterInterface
     {
-        $registry = $this->get('sirian_suggest.registry');
-        if (!$registry->has($name)) {
+        if (!$this->registry->has($name)) {
             throw new NotFoundHttpException();
         }
-        return $registry->get($name);
+        return $this->registry->get($name);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Sirian\SuggestBundle\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -9,12 +10,6 @@ use Symfony\Component\DependencyInjection\Loader;
 
 class SirianSuggestExtension extends Extension
 {
-    const VERSION_4_COMPATIBLE_DEFINITION = 'Symfony\Component\DependencyInjection\ChildDefinition';
-    const LEGACY_COMPATIBLE_DEFINITION = 'Symfony\Component\DependencyInjection\DefinitionDecorator';
-
-    /**
-     * {@inheritDoc}
-     */
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
@@ -48,14 +43,8 @@ class SirianSuggestExtension extends Extension
     {
         $registry = $container->getDefinition('sirian_suggest.registry');
 
-        if (class_exists(self::VERSION_4_COMPATIBLE_DEFINITION)) {
-            $definition = self::VERSION_4_COMPATIBLE_DEFINITION;
-        } else {
-            $definition = self::LEGACY_COMPATIBLE_DEFINITION;
-        }
-
         foreach ($suggesterConfigs as $id => $config) {
-            $definition = new $definition($parentService);
+            $definition = new ChildDefinition($parentService);
             $definition
                 ->replaceArgument(1, [
                     'class' => $config['class'],

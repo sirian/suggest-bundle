@@ -1,22 +1,15 @@
 {
     "name": "sirian/suggest-bundle",
     "type": "library",
+    "license": "MIT",
     "description": "symfony2 suggest (autocomplete) bundle",
     "keywords": [],
     "autoload": {
         "psr-4": { "Sirian\\SuggestBundle\\": "src/" }
     },
     "require": {
-        "php": ">=5.4.0"
-    },
-    "suggests": {
-        "symfony/framework-bundle": "To use with Symfony framework",
-        "symfony/form": "To use with Symfony framework",
-        "doctrine/doctrine-bundle": "To use with Doctrine"
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "2.0.x-dev"
-        }
+        "php": "^7.3",
+        "symfony/framework-bundle": "^5.0",
+        "symfony/form": "^5.0"
     }
 }

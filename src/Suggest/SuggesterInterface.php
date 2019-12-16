@@ -4,21 +4,13 @@ namespace Sirian\SuggestBundle\Suggest;
 
 interface SuggesterInterface
 {
-    /**
-     * @param SuggestQuery $query
-     * @return Result
-     */
-    public function suggest(SuggestQuery $query);
+    public function suggest(SuggestQuery $query): Result;
 
     /**
-     * @param array|\Traversable $objects
+     * @param iterable $objects
      * @return Item[]
      */
-    public function transform($objects);
+    public function transform(iterable $objects): array;
 
-    /**
-     * @param array $ids
-     * @return mixed
-     */
-    public function reverseTransform(array $ids);
+    public function reverseTransform(array $ids): array;
 }

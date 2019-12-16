@@ -2,12 +2,11 @@
 
 namespace Sirian\SuggestBundle\Suggest;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 abstract class DoctrineSuggester implements SuggesterInterface
@@ -30,12 +29,12 @@ abstract class DoctrineSuggester implements SuggesterInterface
         $this->options = $this->prepareOptions($options);
     }
 
-    public function reverseTransform(array $ids)
+    public function reverseTransform(array $ids): array
     {
         return $this->getLoader()->getEntitiesByIds($this->options['id_property'], $ids);
     }
 
-    public function transform($objects)
+    public function transform($objects): array
     {
         $result = [];
         foreach ($objects as $object) {
@@ -44,16 +43,7 @@ abstract class DoctrineSuggester implements SuggesterInterface
         return $result;
     }
 
-    protected function transformObject($object)
-    {
-        $item = new Item();
-        $item->id = $this->propertyAccessor->getValue($object, $this->options['id_property']);
-        $item->text = $this->propertyAccessor->getValue($object, $this->options['property']);
-
-        return $item;
-    }
-
-    public function suggest(SuggestQuery $query)
+    public function suggest(SuggestQuery $query): Result
     {
         $entities = $this->getSuggestLoader($query)->getEntities();
         $hasMore = count($entities) > $this->options['limit'];
@@ -62,7 +52,7 @@ abstract class DoctrineSuggester implements SuggesterInterface
         return new Result($this->transform($entities), $hasMore);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
             ->setDefaults([
@@ -70,14 +60,13 @@ abstract class DoctrineSuggester implements SuggesterInterface
                 'manager' => null,
                 'limit' => 20,
                 'search' => [],
-                'property' => 'name'
-            ])
-        ;
+                'property' => 'name',
+            ]);
 
-        $resolver->setNormalizer('search', function (Options $options, $value) {
+        $resolver->setNormalizer('search', function(Options $options, $value) {
             if (empty($value) && !empty($options['property'])) {
                 $value = [
-                    $options['property'] => self::SEARCH_MIDDLE
+                    $options['property'] => self::SEARCH_MIDDLE,
                 ];
             }
             return $value;
@@ -86,12 +75,21 @@ abstract class DoctrineSuggester implements SuggesterInterface
         $resolver->setRequired(['class']);
 
 
-        $resolver->setNormalizer('manager', function (Options $options, $manager) {
-            return $this->normalize($options, $manager);
+        $resolver->setNormalizer('manager', function($options, $manager) {
+            return $this->selectManager($options, $manager);
         });
     }
 
-    protected function normalize(Options $options, $manager)
+    protected function transformObject(object $object): Item
+    {
+        $item = new Item();
+        $item->id = $this->propertyAccessor->getValue($object, $this->options['id_property']);
+        $item->text = $this->propertyAccessor->getValue($object, $this->options['property']);
+
+        return $item;
+    }
+
+    protected function selectManager(Options $options, ?ObjectManager $manager = null)
     {
         if (null !== $manager) {
             return $this->registry->getManager($manager);
@@ -110,34 +108,24 @@ abstract class DoctrineSuggester implements SuggesterInterface
         return $manager;
     }
 
-    protected function prepareOptions($options)
+    protected function prepareOptions(array $options): array
     {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         return $resolver->resolve($options);
     }
 
-    /**
-     * @return ObjectManager
-     */
-    protected function getManager()
+    protected function getManager(): ObjectManager
     {
         return $this->options['manager'];
     }
 
-    protected function getLimit()
+    protected function getLimit(): int
     {
         return $this->options['limit'];
     }
 
-    /**
-     * @return EntityLoaderInterface
-     */
-    abstract protected function getLoader();
+    abstract protected function getLoader(): EntityLoaderInterface;
 
-    /**
-     * @param SuggestQuery $query
-     * @return EntityLoaderInterface
-     */
-    abstract protected function getSuggestLoader(SuggestQuery $query);
+    abstract protected function getSuggestLoader(SuggestQuery $query): EntityLoaderInterface;
 }
