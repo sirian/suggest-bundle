@@ -3,19 +3,20 @@
 namespace Sirian\SuggestBundle\Suggest;
 
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Bridge\Doctrine\Form\ChoiceList\EntityLoaderInterface;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class EntitySuggester extends DoctrineSuggester
 {
-    protected function getLoader()
+    protected function getLoader(): EntityLoaderInterface
     {
         $options = $this->options;
         return new ORMQueryBuilderLoader($this->createQueryBuilder(), $options['manager'], $options['class']);
     }
 
-    protected function getSuggestLoader(SuggestQuery $query)
+    protected function getSuggestLoader(SuggestQuery $query): EntityLoaderInterface
     {
         $options = $this->options;
         return new ORMQueryBuilderLoader($this->createSuggestQueryBuilder($query), $options['manager'], $options['class']);
