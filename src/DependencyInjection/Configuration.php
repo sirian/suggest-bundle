@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('sirian_suggest');
         if (method_exists($treeBuilder, 'getRootNode')) {
@@ -29,8 +29,6 @@ class Configuration implements ConfigurationInterface
                     ->prototype('variable')
                     ->end()
                 ->end()
-
-
 
         ;
 
